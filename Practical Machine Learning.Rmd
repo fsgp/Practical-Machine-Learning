@@ -1,18 +1,36 @@
 ---
-title: "Practical Machine Learning Project Writeup"
+title: "Practical Machine Learning Project Write up"
 author: "Fernando Gonzalez Prada"
-date: "25 de julio de 2015"
+date: "July 25th, 2015"
 output: html_document
 ---
 
-Load the packages
+#Background
+
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+
+#Data 
+
+The training data for this project are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data are available here: 
+
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment. 
+
+
+#Load the packages
 ```{r}
 library(caret)
 library(randomForest)
 library(e1071)
 ```
 
-Read the data files into R data frames:
+#Read the data files into R data frames:
 
 ```{r}
 train <- read.csv("pml-training.csv", row.names = 1, header = TRUE, na.strings = c("NA","","#DIV/0!"))
@@ -21,41 +39,47 @@ dim(train)
 ```
 The training set consists of 19622 rows and 159 columns.
 
-## Data Cleaning
-The files are loaded mapping the NA, "" and ""#DIV/0!"" values into NA for missing values.
-The are a lot of NA values present in multiple variables.
+#Data Cleaning
+The files are loaded mapping the NA, "" and ""#DIV/0!"" values into NA for missing values handling.
+The are a lot of NA values present in multiple variables. To preserve the space of this report, the summary() command output is omitted, 
 
-Delete the near zero variance predictors
+Remove the near zero variance predictors, to reduce the total size of the data frame
 ```{r}
 nzv_cols <- nearZeroVar(train[, -159])
 if(length(nzv_cols) > 0) 
     train <- train[, -nzv_cols]
 dim(train)
 ```
-Now we hay 123 predictors
+Now we have 123 predictors
 
-Get rid of the columns with NA values
+The next step involves deleting the remaining columns that contains values with NA.
+These columns has almost all the values in NA, so we decided to delete the columns. 
+
 ```{r}
 train = train[ , colSums(is.na(train)) == 0]
 dim(train)
 ```
-Finally, we only consider 58 variables
+Finally, the data frame has 58 variables.
 
 
 ## Random Forest Model
+After trying different models, the best results were obtained with Random Forest.
+The solution involves fiting the algorithm performing 10-fold cross validation to predict the target variable "classe".
 
 ```{r}
 set.seed(1000)
 
- rfModel <- train(classe ~ ., 
-                  method = "rf", 
-                  data = train, 
-                  importance = T, 
-                  trControl = trainControl(method = "cv", number = 10))
-
+# rfModel <- train(classe ~ ., 
+#               method = "rf", 
+#               data = train, 
+#               importance = T, 
+#               trControl = trainControl(method = "cv", number = 10))
+load("rfModel_fsgp.rda")
 rfModel
 ```
-Accuracy Chart
+The accuracy of this Random Forest Model is 99%, quite impressive.
+
+#Accuracy Chart
 ```{r}
 plot(rfModel, ylim = c(0.95, 1))
 ```
@@ -64,12 +88,21 @@ plot(rfModel, ylim = c(0.95, 1))
 ```{r}
 rfModel$finalModel
 ```
-
+The out of sample error is 0.04%
 
 #Variable Importance
 ```{r}
 rfImp = varImp(rfModel, scale = TRUE)
+rfImp
 ```
+The final model consists of 500 trees, and tried with 40 variables at each split. 
+The 5 most important predictors are:
+
+* raw_timestamp_part_1 
+* roll_belt
+* num_window
+* pitch_forearm
+* magnet_dumbbell_z
 
 ```{r}
 plot(rfImp)
@@ -96,5 +129,6 @@ pml_write_files = function(x){
 pml_write_files(pred)
 
 ```
+
 
 
