@@ -120,12 +120,11 @@ dim(train)</code></pre>
 <p>After trying different models, the best results were obtained with Random Forest. The solution involves fiting the algorithm performing 10-fold cross validation to predict the target variable “classe”.</p>
 <pre class="r"><code>set.seed(1000)
 
-# rfModel &lt;- train(classe ~ ., 
-#               method = &quot;rf&quot;, 
-#               data = train, 
-#               importance = T, 
-#               trControl = trainControl(method = &quot;cv&quot;, number = 10))
-load(&quot;rfModel_fsgp.rda&quot;)
+rfModel &lt;- train(classe ~ ., 
+               method = &quot;rf&quot;, 
+               data = train, 
+               importance = T, 
+               trControl = trainControl(method = &quot;cv&quot;, number = 10))
 rfModel</code></pre>
 <pre><code>## Random Forest 
 ## 

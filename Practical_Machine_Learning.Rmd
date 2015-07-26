@@ -67,12 +67,11 @@ The solution involves fiting the algorithm performing 10-fold cross validation t
 ```{r}
 set.seed(1000)
 
-# rfModel <- train(classe ~ ., 
-#               method = "rf", 
-#               data = train, 
-#               importance = T, 
-#               trControl = trainControl(method = "cv", number = 10))
-load("rfModel_fsgp.rda")
+rfModel <- train(classe ~ ., 
+               method = "rf", 
+               data = train, 
+               importance = T, 
+               trControl = trainControl(method = "cv", number = 10))
 rfModel
 ```
 The accuracy of this Random Forest Model is 99%, quite impressive.
