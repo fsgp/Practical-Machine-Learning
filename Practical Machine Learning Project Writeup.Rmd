@@ -1,0 +1,100 @@
+---
+title: "Practical Machine Learning Project Writeup"
+author: "Fernando Gonzalez Prada"
+date: "25 de julio de 2015"
+output: html_document
+---
+
+Load the packages
+```{r}
+library(caret)
+library(randomForest)
+library(e1071)
+```
+
+Read the data files into R data frames:
+
+```{r}
+train <- read.csv("pml-training.csv", row.names = 1, header = TRUE, na.strings = c("NA","","#DIV/0!"))
+test <- read.csv("pml-testing.csv", row.names = 1, header = TRUE, na.strings = c("NA","","#DIV/0!"))
+dim(train)
+```
+The training set consists of 19622 rows and 159 columns.
+
+## Data Cleaning
+The files are loaded mapping the NA, "" and ""#DIV/0!"" values into NA for missing values.
+The are a lot of NA values present in multiple variables.
+
+Delete the near zero variance predictors
+```{r}
+nzv_cols <- nearZeroVar(train[, -159])
+if(length(nzv_cols) > 0) 
+    train <- train[, -nzv_cols]
+dim(train)
+```
+Now we hay 123 predictors
+
+Get rid of the columns with NA values
+```{r}
+train = train[ , colSums(is.na(train)) == 0]
+dim(train)
+```
+Finally, we only consider 58 variables
+
+
+## Random Forest Model
+
+```{r}
+set.seed(1000)
+
+ rfModel <- train(classe ~ ., 
+                  method = "rf", 
+                  data = train, 
+                  importance = T, 
+                  trControl = trainControl(method = "cv", number = 10))
+
+rfModel
+```
+Accuracy Chart
+```{r}
+plot(rfModel, ylim = c(0.95, 1))
+```
+
+#Final model and prediction
+```{r}
+rfModel$finalModel
+```
+
+
+#Variable Importance
+```{r}
+rfImp = varImp(rfModel, scale = TRUE)
+```
+
+```{r}
+plot(rfImp)
+```
+
+
+# Prediction
+```{r}
+pred <- predict(rfModel, test)
+pred
+```
+
+
+
+# Generate the prediction files to submit to the autograder
+```{r}
+pml_write_files = function(x){
+    n = length(x)
+    for(i in 1:n){
+        filename = paste0("./prediction/problem_id_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    }
+}
+pml_write_files(pred)
+
+```
+
+
