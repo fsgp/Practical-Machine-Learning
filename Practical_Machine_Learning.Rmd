@@ -1,16 +1,14 @@
----
-title: "Practical Machine Learning Project Write up"
-author: "Fernando Gonzalez Prada"
-date: "July 25th, 2015"
-output: html_document
----
+# **Practical Machine Learning Project**
+## *Fernando Gonzalez Prada*
+### *July 25th, 2015*
 
-#Background
+
+## Background
 
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
 
 
-#Data 
+## Data 
 
 The training data for this project are available here: 
 
@@ -23,14 +21,14 @@ https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
 The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment. 
 
 
-#Load the packages
+## Load the packages
 ```{r}
 library(caret)
 library(randomForest)
 library(e1071)
 ```
 
-#Read the data files into R data frames:
+## Read the data files into R data frames:
 
 ```{r}
 train <- read.csv("pml-training.csv", row.names = 1, header = TRUE, na.strings = c("NA","","#DIV/0!"))
@@ -39,7 +37,7 @@ dim(train)
 ```
 The training set consists of 19622 rows and 159 columns.
 
-#Data Cleaning
+## Data Cleaning
 The files are loaded mapping the NA, "" and ""#DIV/0!"" values into NA for missing values handling.
 The are a lot of NA values present in multiple variables. To preserve the space of this report, the summary() command output is omitted, 
 
@@ -79,18 +77,18 @@ rfModel
 ```
 The accuracy of this Random Forest Model is 99%, quite impressive.
 
-#Accuracy Chart
+## Accuracy Chart
 ```{r}
 plot(rfModel, ylim = c(0.95, 1))
 ```
 
-#Final model and prediction
+## Final model and prediction
 ```{r}
 rfModel$finalModel
 ```
 The out of sample error is 0.04%
 
-#Variable Importance
+## Variable Importance
 ```{r}
 rfImp = varImp(rfModel, scale = TRUE)
 rfImp
@@ -109,7 +107,7 @@ plot(rfImp)
 ```
 
 
-# Prediction
+## Prediction
 ```{r}
 pred <- predict(rfModel, test)
 pred
@@ -117,7 +115,7 @@ pred
 
 
 
-# Generate the prediction files to submit to the autograder
+## Generate the prediction files to submit to the autograder
 ```{r}
 pml_write_files = function(x){
     n = length(x)
